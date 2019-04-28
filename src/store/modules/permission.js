@@ -65,11 +65,10 @@ function generateRouter(item, isParent) {
   // name string-random 生成唯一字符串 xxxoo_sys_menu 形式 6个随机字符 + path 转换
   // redirect： 判断如果是一级菜单 noredirect
   // component: 判断如果是一级菜单component: Layout
-  console.log(item.component)
   const meta = { icon: item.icon, title: item.name }
   var router = {
     path: item.url,
-    name: item.name,
+    name: item.alias,
     meta: meta,
     // component: item.component === 'Layout' ? Layout : getViews(item.component),
     component: item.component === 'Layout' ? Layout : _import(item.component),

@@ -74,7 +74,7 @@ function generateRouter(item, isParent) {
     component: item.component === 'Layout' ? Layout : _import(item.component),
     // redirect: item.component === 'Layout' ? 'noredirect' :  '',
     // 面包屑上 点击 redirect 的 url  首页/系统管理/菜单管理  , 可点击系统管理
-    redirect: item.redirect ? item.redirect : item.component === 'Layout' ? 'noredirect' : '',
+    // redirect: item.redirect ? item.redirect : item.component === 'Layout' ? 'noredirect' : '',
     // component: isParent ? Layout : componentsMap[item.name],
     alwaysShow: item.children.length === 1
   }

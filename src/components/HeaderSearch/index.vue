@@ -20,7 +20,7 @@
 <script>
 import Fuse from 'fuse.js'
 import path from 'path'
-import i18n from '@/lang'
+// import i18n from '@/lang'
 
 export default {
   name: 'HeaderSearch',
@@ -115,9 +115,9 @@ export default {
 
         if (router.meta && router.meta.title) {
           // generate internationalized title
-          const i18ntitle = i18n.t(`route.${router.meta.title}`)
+          // const i18ntitle = i18n.t(`route.${router.meta.title}`)
 
-          data.title = [...data.title, i18ntitle]
+          data.title = [...data.title, router.meta.title]
 
           if (router.redirect !== 'noredirect') {
             // only push the routes with title

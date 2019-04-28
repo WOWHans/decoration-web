@@ -4,7 +4,7 @@ import store from '../index'
 
 const user = {
   state: {
-    userInfo: {},
+    userInfo: '',
     status: '',
     code: '',
     token: getToken(),
@@ -56,7 +56,6 @@ const user = {
         loginByUsername(username, password).then(response => {
           const data = response.data
           if (data.status) {
-            commit('SET_USER', data.data)
             commit('SET_ROLES', data.data.roles)
             setToken(data.data.cookie)
           }
@@ -89,7 +88,7 @@ const user = {
     GetMenuTree({ commit, state }) {
       return new Promise((resolve, reject) => {
         console.log(store)
-        getRawMenuTree(store.getters.user.userInfo.userId).then(res => {
+        getRawMenuTree(store.getters.user.userId).then(res => {
           const data = res.data
           resolve(data.data)
         }).catch(error => {

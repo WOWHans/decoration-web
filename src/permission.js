@@ -27,8 +27,10 @@ router.beforeEach((to, from, next) => {
       NProgress.done() // if current page is dashboard will not trigger	afterEach hook, so manually handle it
     } else {
       // 判断当前用户是否已拉取完user_info信息
+      // console.log('store', store)
       // const roles = store.getters.roles // note: roles must be a object array! such as: [{id: '1', name: 'editor'}, {id: '2', name: 'developer'}]
-      if (store.getters.addRouters.length <= 0) {
+      if (!store.getters.user) {
+        console.log(1111)
         store.dispatch('GetUserInfo').then(res => {
           store.dispatch('GetMenuTree').then(menuTree => {
             store.dispatch('GenerateRoutes', { menuTree }).then(accessedRouters => {
@@ -39,6 +41,7 @@ router.beforeEach((to, from, next) => {
           })
         })
       } else {
+        console.log(2222)
         next()
       }
       // store

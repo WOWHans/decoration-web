@@ -3,29 +3,18 @@ import Layout from '@/views/layout/Layout'
 
 const _import = path => () => import(`@/views/${path}`)
 
-function convertRouter(asyncRouterMap) {
-  const accessedRouters = []
-  if (asyncRouterMap) {
-    asyncRouterMap.forEach(item => {
-      var parent = generateRouter(item, true)
-      var children = []
-      if (item.children && item.children.length > 0) {
-        item.children.forEach(child => {
-          children.push(generateRouter(child, false))
-          if (child.children && child.children.length >= 1) {
-            convertRouter(child)
-          }
-        })
-      }
-      parent.children = children
-      accessedRouters.push(parent)
-    })
-  }
-  accessedRouters.push({ path: '*', redirect: '/404', hidden: true })
-  return accessedRouters
+function mapAsyncRoutes(asyncRouterMap) {
+  return asyncRouterMap.map(route => {
+    route = generateRouter(route)
+    if (route.children) {
+      route.children = mapAsyncRoutes(route.children)
+    }
+    console.log('route', route)
+    return route
+  })
 }
 
-function generateRouter(item, isParent) {
+function generateRouter(item) {
   // 表单 输入 path： /sys/menu
   // name string-random 生成唯一字符串 xxxoo_sys_menu 形式 6个随机字符 + path 转换
   // redirect： 判断如果是一级菜单 noredirect
@@ -41,7 +30,8 @@ function generateRouter(item, isParent) {
     // 面包屑上 点击 redirect 的 url  首页/系统管理/菜单管理  , 可点击系统管理
     redirect: item.redirect ? item.redirect : item.component === 'Layout' ? 'noredirect' : '',
     // component: isParent ? Layout : componentsMap[item.name],
-    alwaysShow: item.children.length === 1
+    alwaysShow: item.children.length === 1,
+    children: item.children
   }
   console.log('router....', router)
   return router
@@ -61,7 +51,7 @@ const permission = {
   actions: {
     GenerateRoutes({ commit }, data) {
       return new Promise(resolve => {
-        const accessedRouters = convertRouter(data.menuTree)
+        const accessedRouters = mapAsyncRoutes(data.menuTree)
         commit('SET_ROUTES', accessedRouters)
         resolve(accessedRouters)
       })

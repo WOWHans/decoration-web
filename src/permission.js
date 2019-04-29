@@ -4,7 +4,6 @@ import store from './store'
 import NProgress from 'nprogress' // progress bar
 import 'nprogress/nprogress.css' // progress bar style
 import { getToken } from '@/utils/auth'
-// import getters from './store/getters' // get token from cookie
 
 NProgress.configure({ showSpinner: false }) // NProgress Configuration
 
@@ -19,18 +18,13 @@ const whiteList = ['/login', '/auth-redirect'] // no redirect whitelist
 router.beforeEach((to, from, next) => {
   NProgress.start() // start progress bar
   if (getToken()) {
-    // determine if there has token
-
     /* has token*/
     if (to.path === '/login') {
       next({ path: '/' })
       NProgress.done() // if current page is dashboard will not trigger	afterEach hook, so manually handle it
     } else {
       // 判断当前用户是否已拉取完user_info信息
-      // console.log('store', store)
-      // const roles = store.getters.roles // note: roles must be a object array! such as: [{id: '1', name: 'editor'}, {id: '2', name: 'developer'}]
       if (!store.getters.user) {
-        console.log(1111)
         store.dispatch('GetUserInfo').then(res => {
           store.dispatch('GetMenuTree').then(menuTree => {
             store.dispatch('GenerateRoutes', { menuTree }).then(accessedRouters => {
@@ -41,20 +35,8 @@ router.beforeEach((to, from, next) => {
           })
         })
       } else {
-        console.log(2222)
         next()
       }
-      // store
-      //   .dispatch('GetUserInfo')
-      //   .then(res => {
-      //     // 拉取user_info
-      //   })
-      //   .catch(err => {
-      //     store.dispatch('FedLogOut').then(() => {
-      //       Message.error(err)
-      //       next({ path: '/' })
-      //     })
-      //   })
     }
   } else {
     /* has no token*/

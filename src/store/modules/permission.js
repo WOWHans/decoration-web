@@ -2,43 +2,9 @@ import { constantRouterMap } from '@/router'
 import Layout from '@/views/layout/Layout'
 
 const _import = path => () => import(`@/views/${path}`)
-/**
- * 通过meta.role判断是否与当前用户权限匹配
- * @param roles
- * @param route
- */
-function hasPermission(roles, route) {
-  if (route.meta && route.meta.roles) {
-    return roles.some(role => route.meta.roles.includes(role))
-  } else {
-    return true
-  }
-}
-
-/**
- * 递归过滤异步路由表，返回符合用户角色权限的路由表
- * @param routes asyncRoutes
- * @param roles
- */
-export function filterAsyncRoutes(routes, roles) {
-  const res = []
-
-  routes.forEach(route => {
-    const tmp = { ...route }
-    if (hasPermission(roles, tmp)) {
-      if (tmp.children) {
-        tmp.children = filterAsyncRoutes(tmp.children, roles)
-      }
-      res.push(tmp)
-    }
-  })
-
-  return res
-}
 
 function convertRouter(asyncRouterMap) {
   const accessedRouters = []
-  console.log('convertRouter...', asyncRouterMap)
   if (asyncRouterMap) {
     asyncRouterMap.forEach(item => {
       var parent = generateRouter(item, true)
@@ -47,7 +13,6 @@ function convertRouter(asyncRouterMap) {
         item.children.forEach(child => {
           children.push(generateRouter(child, false))
           if (child.children && child.children.length >= 1) {
-            console.log('child' + child.children)
             convertRouter(child)
           }
         })
@@ -74,7 +39,7 @@ function generateRouter(item, isParent) {
     component: item.component === 'Layout' ? Layout : _import(item.component),
     // redirect: item.component === 'Layout' ? 'noredirect' :  '',
     // 面包屑上 点击 redirect 的 url  首页/系统管理/菜单管理  , 可点击系统管理
-    // redirect: item.redirect ? item.redirect : item.component === 'Layout' ? 'noredirect' : '',
+    redirect: item.redirect ? item.redirect : item.component === 'Layout' ? 'noredirect' : '',
     // component: isParent ? Layout : componentsMap[item.name],
     alwaysShow: item.children.length === 1
   }
@@ -84,28 +49,19 @@ function generateRouter(item, isParent) {
 
 const permission = {
   state: {
-    routers: [],
+    routes: [],
     addRouters: []
   },
   mutations: {
-    SET_ROUTES: (state, routers) => {
-      state.addRouters = routers
-      state.routers = constantRouterMap.concat(routers)
+    SET_ROUTES: (state, routes) => {
+      state.addRoutes = routes
+      state.routes = constantRouterMap.concat(routes)
     }
   },
   actions: {
     GenerateRoutes({ commit }, data) {
       return new Promise(resolve => {
-        // const { roles } = data
-        // let accessedRoutes
-        // if (roles.includes('admin')) {
-        //   accessedRoutes = asyncRoutes
-        // } else {
-        //   accessedRoutes = filterAsyncRoutes(asyncRoutes, roles)
-        // }
-        console.log('asyncRouterMap.........', data.menuTree)
         const accessedRouters = convertRouter(data.menuTree)
-        console.log('accessedRouters.........', accessedRouters)
         commit('SET_ROUTES', accessedRouters)
         resolve(accessedRouters)
       })
